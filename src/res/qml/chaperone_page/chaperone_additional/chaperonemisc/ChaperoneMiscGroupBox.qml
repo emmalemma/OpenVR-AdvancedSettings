@@ -61,11 +61,43 @@ GroupBox {
 
         }
 
+        RowLayout {
+
+            MyText {
+                text: "Turn counter alpha:"
+                horizontalAlignment: Text.AlignRight
+                Layout.rightMargin: 10
+            }
+
+            MySlider {
+                id: turnCounterAlphaSlider
+                from: 0
+                to: 1
+                stepSize: 0.01
+                value: 0.5
+                Layout.preferredWidth: 250
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
+                onValueChanged: {
+                    turnCounterAlphaText.text = turnCounterAlphaSlider.value.toFixed(2)
+                    ChaperoneTabController.turnCounterAlpha = turnCounterAlphaSlider.value
+                }
+            }
+
+            MyText {
+                id: turnCounterAlphaText
+                text: "0"
+                horizontalAlignment: Text.AlignRight
+                Layout.preferredWidth: 60
+                Layout.rightMargin: 10
+            }
+        }
+
     }
 
     Component.onCompleted: {
             chaperoneFloorToggleBtn.checked = ChaperoneTabController.chaperoneFloorToggle
             legacyCenterMarkerbtn.checked = ChaperoneTabController.centerMarker
+            turnCounterAlphaSlider.value = ChaperoneTabController.turnCounterAlpha
     }
 
     Connections {
@@ -75,6 +107,9 @@ GroupBox {
         }
         onCenterMarkerChanged:{
             legacyCenterMarkerbtn.checked = ChaperoneTabController.centerMarker
+        }
+        onTurnCounterAlphaChanged:{
+            turnCounterAlphaSlider.value = ChaperoneTabController.turnCounterAlpha
         }
     }
 }

@@ -109,6 +109,8 @@ class MoveCenterTabController : public QObject
                     setTurnComfortFactor NOTIFY turnComfortFactorChanged )
     Q_PROPERTY( double turnSlerp READ turnSlerp WRITE
                     setTurnSlerp NOTIFY turnSlerpChanged )
+    Q_PROPERTY( double turnDeadzone READ turnDeadzone WRITE
+                    setTurnDeadzone NOTIFY turnDeadzoneChanged )
     Q_PROPERTY( bool heightToggle READ heightToggle WRITE setHeightToggle NOTIFY
                     heightToggleChanged )
     Q_PROPERTY( float heightToggleOffset READ heightToggleOffset WRITE
@@ -157,7 +159,9 @@ private:
     int m_rotation = 0;
     int m_oldRotation = 0;
     int m_tempRotation = 0;
-    int backlash = 0;
+    // sign of absorbed backlash during space turn
+    // 0 = still absorbing backlash, -1 = can rotate CCW, +1 = can rotate CW
+    int spaceTurnBacklash = 0;
     bool m_moveShortcutRightPressed = false;
     bool m_moveShortcutLeftPressed = false;
     vr::TrackedDeviceIndex_t m_activeMoveController;
@@ -167,6 +171,7 @@ private:
     // Set lastHandQuaternion.w to -1000.0 when last hand is invalid.
     vr::HmdQuaternion_t m_lastHandQuaternion
         = { k_quaternionInvalidValue, 0.0, 0.0, 0.0 };
+    // raw hand rotation; m_handQuaternion is the smoothed value used to turn playspace
     vr::HmdQuaternion_t m_rawHandQuaternion
         = { k_quaternionInvalidValue, 0.0, 0.0, 0.0 };
     vr::HmdQuaternion_t m_handQuaternion;
@@ -268,6 +273,7 @@ public:
     int dragComfortFactor() const;
     int turnComfortFactor() const;
     double turnSlerp() const;
+    double turnDeadzone() const;
     bool heightToggle() const;
     float heightToggleOffset() const;
     float gravityStrength() const;
@@ -342,6 +348,7 @@ public slots:
     void setDragComfortFactor( int value, bool notify = true );
     void setTurnComfortFactor( int value, bool notify = true );
     void setTurnSlerp( double value, bool notify = true );
+    void setTurnDeadzone( double value, bool notify = true );
     void setDragBounds( bool value, bool notify = true );
     void setTurnBounds( bool value, bool notify = true );
     void setHeightToggle( bool value, bool notify = true );
@@ -396,6 +403,7 @@ signals:
     void dragComfortFactorChanged( int value );
     void turnComfortFactorChanged( int value );
     void turnSlerpChanged( double value );
+    void turnDeadzoneChanged( double value );
     void heightToggleChanged( bool value );
     void heightToggleOffsetChanged( float value );
     void gravityStrengthChanged( float value );

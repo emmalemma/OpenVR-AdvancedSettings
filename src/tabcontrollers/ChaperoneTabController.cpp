@@ -577,6 +577,12 @@ float ChaperoneTabController::chaperoneShowDashboardDistance() const
         settings::DoubleSetting::CHAPERONE_showDashboardDistance ) );
 }
 
+double ChaperoneTabController::turnCounterAlpha()
+{
+    return settings::getSetting(
+        settings::DoubleSetting::CHAPERONE_turnCounterAlpha );
+}
+
 int ChaperoneTabController::chaperoneColorR()
 {
     std::pair<ovr_settings_wrapper::SettingsError, int> p
@@ -1116,6 +1122,19 @@ void ChaperoneTabController::setChaperoneShowDashboardDistance( float value,
     }
 }
 
+void ChaperoneTabController::setTurnCounterAlpha( double value, bool notify )
+{
+    settings::setSetting(
+            settings::DoubleSetting::CHAPERONE_turnCounterAlpha,
+            static_cast<double>( value ) );
+
+    if ( notify )
+    {
+        emit chaperoneShowDashboardDistanceChanged( value );
+    }
+
+}
+
 void ChaperoneTabController::setDisableChaperone( bool value, bool notify )
 {
     if ( disableChaperone() != value )
@@ -1552,8 +1571,8 @@ void ChaperoneTabController::addRightHapticClick( bool rightHapticClickPressed )
 void ChaperoneTabController::initCenterMarkerOverlay()
 {
     // ec.
-    const auto widthInMeters=3.0f;
-    const auto centerAlphaMult=0.5f;
+    const auto widthInMeters = 3.0f;
+    const auto centerAlphaMult = turnCounterAlpha();
 
     std::string overlayFloorMarkerKey
         = std::string( application_strings::applicationKey ) + ".floormarker";
@@ -1570,7 +1589,7 @@ void ChaperoneTabController::initCenterMarkerOverlay()
             m_chaperoneFloorOverlayHandle, widthInMeters );
         updateCenterMarkerOverlayColor();
         ovr_overlay_wrapper::setOverlayAlpha(
-            m_chaperoneFloorOverlayHandle, boundsVisibility() * centerAlphaMult, "" );
+            m_chaperoneFloorOverlayHandle, centerAlphaMult, "" );
         m_centerMarkerOverlayIsInit = true;
     }
     else

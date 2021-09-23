@@ -10,7 +10,7 @@ GroupBox {
 
     label: MyText {
         leftPadding: 10
-        text: "Space Turn (with v4 slerp)"
+        text: "Space Turn (anti-comfort mode)"
         bottomPadding: -12
     }
     background: Rectangle {
@@ -97,22 +97,22 @@ GroupBox {
             }
 
             MyText {
-                text: "Slerp:"
+                text: "Smoothing:"
                 horizontalAlignment: Text.AlignRight
                 Layout.rightMargin: 10
             }
 
             MySlider {
-                id: slerpSlider
+                id: turnSlerpSlider
                 from: 0.9
                 to: 1
-                stepSize: 0.0001
+                stepSize: 0.001
                 value: 0.95
-                Layout.preferredWidth: 500
+                Layout.preferredWidth: 250
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
                 onValueChanged: {
-                    turnSlerpText.text = slerpSlider.value.toFixed(4)
-                    MoveCenterTabController.turnSlerp = slerpSlider.value
+                    turnSlerpText.text = turnSlerpSlider.value.toFixed(3)
+                    MoveCenterTabController.turnSlerp = turnSlerpSlider.value
                 }
             }
 
@@ -120,7 +120,35 @@ GroupBox {
                 id: turnSlerpText
                 text: "0"
                 horizontalAlignment: Text.AlignRight
-                Layout.preferredWidth: 30
+                Layout.preferredWidth: 60
+                Layout.rightMargin: 10
+            }
+
+            MyText {
+                text: "Deadzone (deg):"
+                horizontalAlignment: Text.AlignRight
+                Layout.rightMargin: 10
+            }
+
+            MySlider {
+                id: turnDeadzoneSlider
+                from: 0
+                to: 15
+                stepSize: 0.01
+                value: 5
+                Layout.preferredWidth: 250
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
+                onValueChanged: {
+                    turnDeadzoneText.text = turnDeadzoneSlider.value.toFixed(2)
+                    MoveCenterTabController.turnDeadzone = turnDeadzoneSlider.value
+                }
+            }
+
+            MyText {
+                id: turnDeadzoneText
+                text: "0"
+                horizontalAlignment: Text.AlignRight
+                Layout.preferredWidth: 60
                 Layout.rightMargin: 10
             }
         }
@@ -130,6 +158,8 @@ GroupBox {
         turnBindLeft.checked = MoveCenterTabController.turnBindLeft
         turnBindRight.checked = MoveCenterTabController.turnBindRight
         turnComfortSlider.value = MoveCenterTabController.turnComfortFactor
+        turnSlerpSlider.value = MoveCenterTabController.turnSlerp
+        turnDeadzoneSlider.value = MoveCenterTabController.turnDeadzone
         turnBounds.checked = MoveCenterTabController.turnBounds
     }
 
@@ -144,6 +174,12 @@ GroupBox {
         }
         onTurnComfortFactorChanged: {
             turnComfortSlider.value = MoveCenterTabController.turnComfortFactor
+        }
+        onTurnSlerpChanged: {
+            turnSlerpSlider.value = MoveCenterTabController.turnSlerp
+        }
+        onTurnDeadzoneChanged: {
+            turnDeadzoneSlider.value = MoveCenterTabController.turnDeadzone
         }
         onTurnBoundsChanged: {
             turnBounds.checked = MoveCenterTabController.turnBounds

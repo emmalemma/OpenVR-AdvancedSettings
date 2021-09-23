@@ -424,7 +424,11 @@ private:
         DoubleSettingValue{ DoubleSetting::PLAYSPACE_turnSlerp,
                             SettingCategory::Playspace,
                             QtInfo{ "turnSlerp" },
-                            0.5 },
+                            0.95 },
+        DoubleSettingValue{ DoubleSetting::PLAYSPACE_turnDeadzone,
+                            SettingCategory::Playspace,
+                            QtInfo{ "turnDeadzone" },
+                            5.0 },
 
         DoubleSettingValue{ DoubleSetting::VIDEO_brightnessOpacityValue,
                             SettingCategory::Video,
@@ -475,6 +479,13 @@ private:
                             SettingCategory::Chaperone,
                             QtInfo{ "fadeDistanceRemembered" },
                             0.5 },
+
+        DoubleSettingValue{ DoubleSetting::CHAPERONE_turnCounterAlpha,
+                            SettingCategory::Chaperone,
+                            QtInfo{ "turnCounterAlpha" },
+                            0.5 },
+
+
         DoubleSettingValue{ DoubleSetting::ROTATION_activationDistance,
                             SettingCategory::Rotation,
                             QtInfo{ "activationDistance" },

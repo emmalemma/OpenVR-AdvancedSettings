@@ -603,13 +603,19 @@ void MoveCenterTabController::setDragComfortFactor( int value, bool notify )
 int MoveCenterTabController::turnComfortFactor() const
 {
     return settings::getSetting(
-        settings::DoubleSetting::PLAYSPACE_turnSlerp );
+        settings::IntSetting::PLAYSPACE_turnComfortFactor );
 }
 
 double MoveCenterTabController::turnSlerp() const
 {
     return settings::getSetting(
         settings::DoubleSetting::PLAYSPACE_turnSlerp );
+}
+
+double MoveCenterTabController::turnDeadzone() const
+{
+    return settings::getSetting(
+        settings::DoubleSetting::PLAYSPACE_turnDeadzone );
 }
 
 void MoveCenterTabController::setTurnComfortFactor( int value, bool notify )
@@ -632,6 +638,17 @@ void MoveCenterTabController::setTurnSlerp( double value, bool notify )
     if ( notify )
     {
         emit turnSlerpChanged( value );
+    }
+}
+
+void MoveCenterTabController::setTurnDeadzone( double value, bool notify )
+{
+    settings::setSetting( settings::DoubleSetting::PLAYSPACE_turnDeadzone,
+                          value );
+
+    if ( notify )
+    {
+        emit turnDeadzoneChanged( value );
     }
 }
 
@@ -2385,7 +2402,7 @@ void MoveCenterTabController::updateHandTurn(
     // Get handMatrixAbsolute in un-rotated coordinates.
     utils::matMul33( handMatrixAbsolute, handMatrixRotMat, handMatrix );
 
-    // Convert pose matrix to quaternion
+    // pre-smoothed value
     m_rawHandQuaternion = quaternion::fromHmdMatrix34( handMatrixAbsolute );
 
     if ( m_lastRotateHand == m_activeTurnHand )
@@ -2401,27 +2418,31 @@ void MoveCenterTabController::updateHandTurn(
 
         else
         {
-            // interpolate
+            // calculate amount to interpolate
             double slerpDiff = quaternion::getYaw(quaternion::multiply(
                 m_rawHandQuaternion,
                 quaternion::conjugate( m_handQuaternion ) ));
-            double deadzone = 0.1;// rotation tolerance in radians, absorbs backlash
-            if (backlash == 0) {
+
+            // absorb spaceTurnBacklash
+            double deadzone = turnDeadzone() * 100 * k_centidegreesToRadians;
+
+            if (spaceTurnBacklash == 0) {
                 if (slerpDiff < -deadzone) {
-                    backlash = -1;
+                    spaceTurnBacklash = -1;
                 }
                 if (slerpDiff > deadzone) {
-                    backlash = 1;
+                    spaceTurnBacklash = 1;
                 }
                 return;
-            } else if (backlash < 0 && slerpDiff >= 0) {
-                backlash = 0;
+            } else if (spaceTurnBacklash < 0 && slerpDiff >= 0) {
+                spaceTurnBacklash = 0;
                 return;
-            } else if (backlash > 0 && slerpDiff <= 0) {
-                backlash = 0;
+            } else if (spaceTurnBacklash > 0 && slerpDiff <= 0) {
+                spaceTurnBacklash = 0;
                 return;
             }
 
+            // interpolate previous value to smooth
             m_handQuaternion = quaternion::slerp(m_handQuaternion, m_rawHandQuaternion, 1 - turnSlerp());
 
             // Construct a quaternion representing difference
@@ -2449,7 +2470,7 @@ void MoveCenterTabController::updateHandTurn(
             setRotation( newRotationAngleDeg );
         }
     } else {
-        backlash = 0;
+        spaceTurnBacklash = 0;
         m_handQuaternion = m_rawHandQuaternion;
     }
 

@@ -68,6 +68,7 @@ enum class DoubleSetting
     PLAYSPACE_gravityStrength,
     PLAYSPACE_flingStrength,
     PLAYSPACE_turnSlerp,
+    PLAYSPACE_turnDeadzone,
 
     VIDEO_brightnessOpacityValue,
     VIDEO_colorOverlayOpacity,
@@ -80,6 +81,7 @@ enum class DoubleSetting
     CHAPERONE_alarmSoundDistance,
     CHAPERONE_showDashboardDistance,
     CHAPERONE_fadeDistanceRemembered,
+    CHAPERONE_turnCounterAlpha,
 
     ROTATION_activationDistance,
     ROTATION_deactivateDistance,

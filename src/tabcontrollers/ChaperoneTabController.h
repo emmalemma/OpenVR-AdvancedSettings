@@ -299,6 +299,11 @@ class ChaperoneTabController : public QObject
                 chaperoneAlarmSoundDistanceChanged )
 
     Q_PROPERTY(
+        double turnCounterAlpha READ turnCounterAlpha WRITE
+            setTurnCounterAlpha NOTIFY
+                turnCounterAlphaChanged )
+
+    Q_PROPERTY(
         bool chaperoneShowDashboardEnabled READ isChaperoneShowDashboardEnabled
             WRITE setChaperoneShowDashboardEnabled NOTIFY
                 chaperoneShowDashboardEnabledChanged )
@@ -409,6 +414,8 @@ public:
     int chaperoneColorA();
     float boundsVisibility();
 
+    double turnCounterAlpha();
+
     bool centerMarkerNew();
     bool m_centerMarkerOverlayNeedsUpdate = false;
 
@@ -483,6 +490,8 @@ public slots:
 
     void setCenterMarkerNew( bool value, bool notify = true );
 
+    void setTurnCounterAlpha( double value, bool notify = true );
+
     void setCollisionBoundStyle( int value,
                                  bool notify = true,
                                  bool isTemp = false );
@@ -537,6 +546,8 @@ signals:
     void chaperoneColorGChanged( int value );
     void chaperoneColorBChanged( int value );
     void chaperoneColorAChanged( int value );
+
+    void turnCounterAlphaChanged( double value );
 
     void collisionBoundStyleChanged( int value );
 
