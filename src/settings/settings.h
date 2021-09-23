@@ -67,6 +67,7 @@ enum class DoubleSetting
     PLAYSPACE_heightToggleOffset,
     PLAYSPACE_gravityStrength,
     PLAYSPACE_flingStrength,
+    PLAYSPACE_turnSlerp,
 
     VIDEO_brightnessOpacityValue,
     VIDEO_colorOverlayOpacity,

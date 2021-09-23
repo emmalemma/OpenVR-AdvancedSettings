@@ -10,7 +10,7 @@ GroupBox {
 
     label: MyText {
         leftPadding: 10
-        text: "Space Turn (for manual redirected walking)"
+        text: "Space Turn (with v4 slerp)"
         bottomPadding: -12
     }
     background: Rectangle {
@@ -86,6 +86,42 @@ GroupBox {
                 onCheckedChanged: {
                     MoveCenterTabController.turnBounds = this.checked
                 }
+            }
+        }
+
+        RowLayout {
+            Layout.fillWidth: true
+
+            Item {
+                Layout.fillWidth: true
+            }
+
+            MyText {
+                text: "Slerp:"
+                horizontalAlignment: Text.AlignRight
+                Layout.rightMargin: 10
+            }
+
+            MySlider {
+                id: slerpSlider
+                from: 0.9
+                to: 1
+                stepSize: 0.0001
+                value: 0.95
+                Layout.preferredWidth: 500
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
+                onValueChanged: {
+                    turnSlerpText.text = slerpSlider.value.toFixed(4)
+                    MoveCenterTabController.turnSlerp = slerpSlider.value
+                }
+            }
+
+            MyText {
+                id: turnSlerpText
+                text: "0"
+                horizontalAlignment: Text.AlignRight
+                Layout.preferredWidth: 30
+                Layout.rightMargin: 10
             }
         }
     }

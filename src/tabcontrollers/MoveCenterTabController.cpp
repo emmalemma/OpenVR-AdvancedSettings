@@ -603,7 +603,13 @@ void MoveCenterTabController::setDragComfortFactor( int value, bool notify )
 int MoveCenterTabController::turnComfortFactor() const
 {
     return settings::getSetting(
-        settings::IntSetting::PLAYSPACE_turnComfortFactor );
+        settings::DoubleSetting::PLAYSPACE_turnSlerp );
+}
+
+double MoveCenterTabController::turnSlerp() const
+{
+    return settings::getSetting(
+        settings::DoubleSetting::PLAYSPACE_turnSlerp );
 }
 
 void MoveCenterTabController::setTurnComfortFactor( int value, bool notify )
@@ -614,6 +620,18 @@ void MoveCenterTabController::setTurnComfortFactor( int value, bool notify )
     if ( notify )
     {
         emit turnComfortFactorChanged( value );
+    }
+}
+
+
+void MoveCenterTabController::setTurnSlerp( double value, bool notify )
+{
+    settings::setSetting( settings::DoubleSetting::PLAYSPACE_turnSlerp,
+                          value );
+
+    if ( notify )
+    {
+        emit turnSlerpChanged( value );
     }
 }
 
@@ -2368,7 +2386,7 @@ void MoveCenterTabController::updateHandTurn(
     utils::matMul33( handMatrixAbsolute, handMatrixRotMat, handMatrix );
 
     // Convert pose matrix to quaternion
-    m_handQuaternion = quaternion::fromHmdMatrix34( handMatrixAbsolute );
+    m_rawHandQuaternion = quaternion::fromHmdMatrix34( handMatrixAbsolute );
 
     if ( m_lastRotateHand == m_activeTurnHand )
     {
@@ -2377,11 +2395,35 @@ void MoveCenterTabController::updateHandTurn(
         // guaranteed for doubles comparison.
         if ( m_lastHandQuaternion.w < k_quaternionUnderIsInvalidValueThreshold )
         {
+            m_handQuaternion = m_rawHandQuaternion;
             m_lastHandQuaternion = m_handQuaternion;
         }
 
         else
         {
+            // interpolate
+            double slerpDiff = quaternion::getYaw(quaternion::multiply(
+                m_rawHandQuaternion,
+                quaternion::conjugate( m_handQuaternion ) ));
+            double deadzone = 0.1;// rotation tolerance in radians, absorbs backlash
+            if (backlash == 0) {
+                if (slerpDiff < -deadzone) {
+                    backlash = -1;
+                }
+                if (slerpDiff > deadzone) {
+                    backlash = 1;
+                }
+                return;
+            } else if (backlash < 0 && slerpDiff >= 0) {
+                backlash = 0;
+                return;
+            } else if (backlash > 0 && slerpDiff <= 0) {
+                backlash = 0;
+                return;
+            }
+
+            m_handQuaternion = quaternion::slerp(m_handQuaternion, m_rawHandQuaternion, 1 - turnSlerp());
+
             // Construct a quaternion representing difference
             // between old hand and new hand.
             vr::HmdQuaternion_t handDiffQuaternion = quaternion::multiply(
@@ -2406,7 +2448,11 @@ void MoveCenterTabController::updateHandTurn(
 
             setRotation( newRotationAngleDeg );
         }
+    } else {
+        backlash = 0;
+        m_handQuaternion = m_rawHandQuaternion;
     }
+
     m_lastHandQuaternion = m_handQuaternion;
     m_lastRotateHand = m_activeTurnHand;
 }

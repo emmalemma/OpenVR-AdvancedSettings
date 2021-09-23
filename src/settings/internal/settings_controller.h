@@ -421,6 +421,10 @@ private:
                             SettingCategory::Playspace,
                             QtInfo{ "flingStrength" },
                             1.0 },
+        DoubleSettingValue{ DoubleSetting::PLAYSPACE_turnSlerp,
+                            SettingCategory::Playspace,
+                            QtInfo{ "turnSlerp" },
+                            0.5 },
 
         DoubleSettingValue{ DoubleSetting::VIDEO_brightnessOpacityValue,
                             SettingCategory::Video,

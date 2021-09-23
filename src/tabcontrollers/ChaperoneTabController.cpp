@@ -1551,6 +1551,10 @@ void ChaperoneTabController::addRightHapticClick( bool rightHapticClickPressed )
 
 void ChaperoneTabController::initCenterMarkerOverlay()
 {
+    // ec.
+    const auto widthInMeters=3.0f;
+    const auto centerAlphaMult=0.5f;
+
     std::string overlayFloorMarkerKey
         = std::string( application_strings::applicationKey ) + ".floormarker";
     ovr_overlay_wrapper::OverlayError overlayError
@@ -1563,10 +1567,10 @@ void ChaperoneTabController::initCenterMarkerOverlay()
         ovr_overlay_wrapper::setOverlayFromFile(
             m_chaperoneFloorOverlayHandle, m_floorMarkerFN, "" );
         ovr_overlay_wrapper::setOverlayWidthInMeters(
-            m_chaperoneFloorOverlayHandle, 0.5f );
+            m_chaperoneFloorOverlayHandle, widthInMeters );
         updateCenterMarkerOverlayColor();
         ovr_overlay_wrapper::setOverlayAlpha(
-            m_chaperoneFloorOverlayHandle, boundsVisibility(), "" );
+            m_chaperoneFloorOverlayHandle, boundsVisibility() * centerAlphaMult, "" );
         m_centerMarkerOverlayIsInit = true;
     }
     else
